@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    
+</head>
+
+<body>
+    <%- include("../partials/navbar") %>
+
+    <main class="detay-konteyner">
+        <div class="detay-kart">
+
+            <div class="ilan-icerik">
+                <nav class="breadcrumb">
+                    <a href="/ilanlar">İş İlanları</a> / <span>
+                        <%= ilan.kategori ? ilan.kategori.kategori_adi : 'Genel' %>
+                    </span>
+                </nav>
+
+                <h1 class="detay-baslik">
+                    <%= ilan.baslik %>
+                </h1>
+
+                <div class="ilan-ozellikler">
+                    <div class="ozellik-item">
+                        <strong>Kategori:</strong>
+                        <span>
+                            <%= ilan.kategori ? ilan.kategori.kategori_adi : '-' %>
+                        </span>
+                    </div>
+                    <div class="ozellik-item">
+                        <strong>Yayınlanma Tarihi:</strong>
+                        <span>
+                            <%= ilan.ilan_tarihi ? new Date(ilan.ilan_tarihi).toLocaleDateString('tr-TR') : '' %>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="ilan-aciklama-alani">
+                    <h3>İş Açıklaması</h3>
+                    <p>
+                        <%= ilan.aciklama %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="ilan-sidebar">
+                <div class="musteri-kutu">
+                    <h4>İlan Sahibi</h4>
+                    <% const ilanSahibi = ilan.user || ilan.User || {}; %>
+                    <p><strong>
+                        <a href="/kullanici/<%= ilanSahibi.id %>" style=" color: rgb(0, 0, 0); cursor: pointer;">
+                            <%= ilanSahibi.ad || 'İsimsiz' %> <%= ilanSahibi.soyad || '' %> </a>
+                        </strong></p>
+                    <p class="rol-etiket" style="margin-top: 5px;">
+                        <%= ilanSahibi.rol || 'Kullanıcı' %>
+                    </p>
+                </div>
+                
+                <% if (ilan.durum !== 2) { %>
+                    <% if (locals.user && (locals.user.id == ilan.musteri_id || locals.user.rol === "admin")) { %>
+                        <form action="/ilan-sil/<%= ilan.id %>" method="POST" class="onay-formu"
+                            data-mesaj="Bu ilanı silmek istediğinize emin misiniz?" data-renk="kirmizi"
+                            style="margin-top: 15px; width: 100%;">
+                            <button type="submit"
+                                style="width: 100%; background-color: #ef4444; color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.95rem; display: block;">
+                                İlanı Sil
+                            </button>
+                        </form>
+                    <% } %>
+                <% } %>
+
+                <div class="teklif-alani"
+                    style="margin-top: 20px; padding: 20px; background: #f9f9f9; border-radius: 8px; text-align: center;">
+                    <% if (!locals.user) { %>
+                        <p style="color: #575650; margin: 0;">Teklif vermek için lütfen <a
+                                href="/giris" style="font-weight: bold; color: #111;">giriş yapın</a>.</p>
+                    <% } else if (locals.user.id == ilan.musteri_id) { %>
+                        <p style="color: #383d41; margin: 0;">Kendi ilanınıza teklif veremezsiniz.</p>
+                    <% } else { %>
+                        <button id="teklifModalAc" class="incele-buton tam-genislik">Teklif Ver</button>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 30px; border-radius: 12px; margin-top: 30px;">
+            <h3 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+               Yorumlar
+            </h3>
+
+            <% if (locals.user) { %>
+                <form action="/ilan/<%= ilan.id %>/yorum-yap" method="POST" style="margin-top: 20px; margin-bottom: 30px;">
+                    <textarea name="yorum_metni" rows="3" placeholder="İlan hakkında soru sorun..." required 
+                        style="width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #ccc; resize: vertical;"></textarea>
+                    
+                    <div style="text-align: right; margin-top: 10px;">
+                        <button type="submit" style="background: #000000; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                            Gönder
+                        </button>
+                    </div>
+                </form>
+            <% } else { %>
+                <div style="padding: 15px; background: #f9f9f9; text-align: center; margin-bottom: 30px;">
+                    <p style="margin: 0;">Yorum yapmak için <a href="/giris">giriş yapın</a>.</p>
+                </div>
+            <% } %>
+
+            <div>
+                <% const yorumlar = ilan.yorumlar || []; %>
+
+                <% if (yorumlar && yorumlar.length > 0) { %>
+                    <% yorumlar.forEach(yorum => { %>
+                        
+                        <% 
+                            const isSahip = (yorum.user_id == ilan.musteri_id); 
+                            const yorumYapan = yorum.user || yorum.User || {}; 
+                        %>
+                        
+                        <div class="yorum-kart-ozel <%= isSahip ? 'sahip-yorumu' : 'musteri-yorumu' %>">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <strong>
+                                    <%= yorumYapan.ad || 'İsimsiz' %> <%= yorumYapan.soyad || '' %>
+                                    <% if (isSahip) { %>
+                                        <span style="font-size: 0.8rem; background: #1a3b5633; color: #1a3b56; padding: 2px 5px; border-radius: 3px; margin-left: 5px; border: 2px solid #1a3b56;">İlan Sahibi</span>
+                                    <% } %>
+                                    <% if (!isSahip) { %>
+                                     <span style="font-size: 0.8rem; background: #ff008c33; color: #fc008f; padding: 2px 5px; border: 2px solid #fc008f; border-radius: 3px; margin-left: 5px;">Müşteri</span>
+                                    <% } %>
+                                </strong>
+                                
+                                <span style="font-size: 0.8rem; color: #777;">
+                                    <%= yorum.yorum_tarihi ? new Date(yorum.yorum_tarihi).toLocaleDateString('tr-TR') : '' %>
+                                </span>
+                                
+                            </div>
+                            <p style="margin: 0;">
+                                <%= yorum.yorum_metni %>
+                            </p>
+                        </div>
+
+                    <% }) %>
+                <% } else { %>
+                    <p style="text-align: center; color: #777;">Henüz yorum yapılmamış.</p>
+                <% } %>
+            </div>
+        </div>
+
+    </main>
+
+    <% if (locals.user && locals.user.id != ilan.musteri_id) { %>
+        <div id="teklifModal" class="modal-arkaplan">
+            <div class="modal-icerik">
+                <span class="modal-kapat">&times;</span>
+                <h2 style="margin-top: 0; margin-bottom: 20px;">Teklif Detayları</h2>
+
+                <form action="/teklif-ver/<%= ilan.id %>" method="POST">
+                    <div class="form-grup" style="margin-bottom: 15px; text-align: left;">
+                        <label for="teklif_fiyati" style="display: block; margin-bottom: 5px; font-weight: bold;">Teklifiniz (₺)</label>
+                        <input type="number" id="teklif_fiyati" name="teklif_fiyati" placeholder="Teklif" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                    </div>
+
+                    <div class="form-grup" style="margin-bottom: 20px; text-align: left;">
+                        <label for="mesaj" style="display: block; margin-bottom: 5px; font-weight: bold;">Mesaj</label>
+                        <textarea id="mesaj" name="mesaj" rows="4" placeholder="Mesaj" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; resize: vertical;"></textarea>
+                    </div>
+
+                    <button type="submit" class="incele-buton tam-genislik">Teklifi Gönder</button>
+                </form>
+            </div>
+        </div>
+    <% } %>
+
+    <%- include("../partials/footer") %>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("teklifModal");
+            const btn = document.getElementById("teklifModalAc");
+            const span = document.querySelector(".modal-kapat");
+
+            if (btn && modal) {
+                btn.onclick = function () {
+                    modal.style.display = "block";
+                }
+            }
+
+            if (span && modal) {
+                span.onclick = function () {
+                    modal.style.display = "none";
+                }
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

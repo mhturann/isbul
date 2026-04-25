@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+</head>
+<%- include("../partials/navbar") %>
+
+    <body>
+        <main class="sohbet-konteyner">
+
+            <div class="sohbet-baslik">
+                <div >
+                    <a href="/kullanici/<%= karsiTaraf.id %>" style="color: black;">
+                        <h2 style="margin: 0 0 5px 0; color: #1f2937;">
+                            <%= karsiTaraf.ad %>
+                                <%= karsiTaraf.soyad %>
+                        </h2>
+                    </a>
+                    <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">
+                        İlan: <strong>
+                            <%= ilan.baslik %>
+                        </strong>
+                    </p>
+                </div>
+                <a href="/profil" class="geri-don-btn">Profile Dön</a>
+            </div>
+
+            <div class="mesajlar-kutusu" id="sohbetEkrani">
+
+                <% if (sohbet && sohbet.length> 0) { %>
+                    <% sohbet.forEach(msj=> { %>
+
+                        <% if (msj.gonderen_id===userId) { %>
+                            <div class="mesaj-satiri benim-mesajim">
+                                <div class="mesaj-balonu">
+                                    <%= msj.mesaj %>
+                                </div>
+                                <div style="text-align: right; margin-top: 4px; padding-right: 5px;">
+                                    <% if (msj.okundu_mu===true) { %>
+                                        <span
+                                            style="font-size: 0.7rem; color: #10b981; font-weight: bold;">Görüldü</span>
+                                        <% } else { %>
+                                            <span style="font-size: 0.7rem; color: #9ca3af;">İletildi</span>
+                                            <% } %>
+                                </div>
+                            </div>
+
+                            <% } else { %>
+                                <div class="mesaj-satiri karsi-mesaj">
+                                    <span class="gonderen-isim">
+                                        <%= msj.gonderen.ad %>
+                                            <%= msj.gonderen.soyad %>
+                                    </span>
+                                    <div class="mesaj-balonu">
+                                        <%= msj.mesaj %>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                    <% }) %>
+                                        <% } else { %>
+                                            <div style="text-align: center; padding: 40px; color: #9ca3af;">
+                                                <p>Henüz mesaj yok. İlk mesajı siz gönderin!</p>
+                                            </div>
+                                            <% } %>
+
+            </div>
+
+            <div class="mesaj-yazma-alani">
+                <form action="/mesaj-gonder/<%= ilan.id %>" method="POST"
+                    style="display: flex; gap: 10px; width: 100%;">
+                    <input type="text" name="mesaj_icerik" class="mesaj-input" placeholder="Mesajınızı yazın..."
+                        required autocomplete="off">
+                    <button type="submit" class="gonder-btn">Gönder</button>
+                </form>
+            </div>
+
+        </main>
+
+
+        <%- include("../partials/footer") %>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const sohbetEkrani = document.getElementById("sohbetEkrani");
+                    sohbetEkrani.scrollTop = sohbetEkrani.scrollHeight;
+                });
+            </script>
+    </body>
+
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+</head>
+<%- include("../partials/navbar") %>
+
+    <body>
+        <main class="ilanlar-konteyner">
+            <div class="ilanlar-baslik-alani">
+                <h1 class="sayfa-basligi">İş İlanlarını İncele</h1>
+                <p class="sayfa-alt-metni">Diğer insanların paylaştığı iş ilanlarını inceleyin.</p>
+            </div>
+            <div class="filtre-konteyner">
+                <form action="/ilanlar" method="GET" class="kategori-form">
+                    <select name="kategori" onchange="this.form.submit()" class="kategori-select">
+                        <option value="">Tüm Kategoriler</option>
+                        <% if (typeof kategoriler !=='undefined' && kategoriler.length> 0) { %>
+                            <% kategoriler.forEach(kat=> { %>
+                                <option value="<%= kat.kategori_adi %>" <%=typeof seciliKategori !=='undefined' &&
+                                    seciliKategori===kat.kategori_adi ? 'selected' : '' %>>
+                                    <%= kat.kategori_adi %>
+                                </option>
+                                <% }) %>
+                                    <% } %>
+                    </select>
+                </form>
+            </div>
+
+            <div class="ilan-listesi">
+                <% if (ilanlar && ilanlar.length> 0) { %>
+                    <% ilanlar.forEach(ilan=> { %>
+                        <div class="ilan-kart">
+                            <div class="ilan-kart-govde">
+                                <div class="ilan-ust-bilgi">
+                                    <h2 class="ilan-baslik">
+                                        <%= ilan.baslik %>
+                                    </h2>
+                                </div>
+
+                                <p class="ilan-ozet">
+                                    <%= ilan.aciklama.length> 120 ? ilan.aciklama.substring(0, 120) + '...' :
+                                        ilan.aciklama %>
+                                </p>
+                            </div>
+
+                            <div class="ilan-kart-footer">
+                                <div class="ilan-meta">
+                                    <span class="ilan-durum-badge">✓ Onaylı İlan</span>
+                                </div>
+                                <a href="/ilan/<%= ilan.id %>" class="incele-buton">İncele</a>
+                            </div>
+                        </div>
+                        <% }) %>
+                            <% } else { %>
+                                <div class="ilan-yok">
+                                    <p>Henüz yayınlanmış bir ilan bulunamadı.</p>
+                                </div>
+                                <% } %>
+            </div>
+        </main>
+
+        <%- include("../partials/footer") %>
+    </body>
+
+</html>

@@ -1,0 +1,104 @@
+<footer class="footer">
+    <% if (locals.toastMesaj) { %>
+        <div id="toast-bildirim" class="toast-kutu">
+            <%= toastMesaj %>
+        </div>
+        <% } %>
+            <div class="container">
+                <div class="footer-all">
+                    <div class="footer-left" style="padding: 30px; max-width:300px;">
+                        <p class="ana">İş İlanları</p>
+                        <p>Aradığınız iş ilanlarını burada bulabilirsiniz.</p>
+                    </div>
+                    <div class="footer-mid" style="padding: 30px; ">
+                        <p class="ana">Linkler</p>
+                        <a href="">Anasayfa</a>
+                        <a href="">İş İlanları</a>
+
+                    </div>
+                    <div class="footer-right" style="padding: 30px; ">
+                        <p class="ana">İletişim</p>
+                        <p>+90 555 555 55 55</p>
+                        <p>isbul@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center; padding: 15px 0;">ISBUL Tüm hakları saklıdır.</p>
+            <div id="globalOnayModal" class="modal-arkaplan" style="display: none; z-index: 9999;">
+                <div class="modal-icerik" style="text-align: center; max-width: 400px; padding: 30px 20px;">
+                    <h2 style="color: #1f2937; margin-top: 0; font-size: 1.5rem;">Emin misiniz?</h2>
+                    <p id="onayMesaj" style="color: #4b5563; margin-bottom: 25px; font-size: 1rem;">Bu işlemi onaylıyor
+                        musunuz?</p>
+
+                    <div style="display: flex; justify-content: center; gap: 15px;">
+                        <button id="onayIptalBtn"
+                            style="background: #e5e7eb; color: #374151; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 1rem;">
+                            Vazgeç
+                        </button>
+                        <button id="onayEvetBtn"
+                            style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 1rem;">
+                            Evet, Onaylıyorum
+                        </button>
+                    </div>
+                </div>
+            </div>
+</footer>
+<script>
+    setTimeout(() => {
+        const toast = document.getElementById('toast-bildirim');
+        if (toast) {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }
+    }, 3000);
+   /*-----------------------*/
+
+   document.addEventListener("DOMContentLoaded", function() {
+        const modal = document.getElementById("globalOnayModal");
+        const mesajAlani = document.getElementById("onayMesaj");
+        const evetBtn = document.getElementById("onayEvetBtn");
+        const iptalBtn = document.getElementById("onayIptalBtn");
+        
+        let bekleyenForm = null;
+        const onayFormlari = document.querySelectorAll(".onay-formu");
+
+        onayFormlari.forEach(form => {
+            form.addEventListener("submit", function(e) {
+                e.preventDefault(); 
+                
+                bekleyenForm = this; 
+                
+               
+                const ozelMesaj = this.getAttribute("data-mesaj");
+                if (ozelMesaj) {
+                    mesajAlani.innerText = ozelMesaj;
+                } else {
+                    mesajAlani.innerText = "Bu işlemi onaylıyor musunuz?";
+                }
+
+                const tehlikeRengi = this.getAttribute("data-renk");
+                if(tehlikeRengi === "kirmizi") {
+                    evetBtn.style.background = "#ef4444";
+                } else {
+                    evetBtn.style.background = "#10b981";
+                }
+                modal.style.display = "block";
+            });
+        });
+
+        if (iptalBtn) {
+            iptalBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+                bekleyenForm = null;
+            });
+        }
+
+        if (evetBtn) {
+            evetBtn.addEventListener("click", function() {
+                if (bekleyenForm) {
+                    bekleyenForm.submit();
+                }
+            });
+        }
+    });
+</script>

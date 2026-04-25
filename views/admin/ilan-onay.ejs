@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <%- include("../partials/navbar") %>
+
+        <main class="admin-konteyner">
+            <div class="admin-baslik-alani">
+                <h1>Onay Bekleyen İlanlar</h1>
+            </div>
+
+            <% if (ilanlar.length> 0) { %>
+                <div class="admin-ilan-liste">
+                    <% ilanlar.forEach(ilan=> { %>
+                        <div class="admin-ilan-kart">
+                            <div class="ilan-bilgileri">
+                                <h3>
+                                    <%= ilan.baslik %>
+                                </h3>
+                                <p class="ilan-aciklamasi">
+                                    <%= ilan.aciklama %>
+                                </p>
+                                <div class="ilan-detay-etiketleri">
+                                    <span>
+                                        <%= ilan.user ? ilan.user.ad + ' ' + ilan.user.soyad : 'Bilinmiyor' %>
+                                    </span>
+                                    <span>
+                                        <%= ilan.ilan_tarihi.toLocaleDateString('tr-TR') %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="ilan-aksiyonlari">
+                                <form action="/admin/ilan-onayla/<%= ilan.id %>" method="POST" class="onay-formu" data-mesaj="Bu ilanı onaylamak istediğinize emin misiniz?" data-renk="yesil" style="display: inline-block;">
+                                    <button type="submit" class="onay-buton">
+                                        Onayla</button>
+                                </form>
+
+                                <form action="/admin/ilan-reddet/<%= ilan.id %>" method="POST" class="onay-formu"
+                                    data-mesaj="Bu ilanı reddedip silmek istediğinize emin misiniz?" data-renk="kirmizi"
+                                    style="display: inline-block;">
+                                    <button type="submit" class="red-buton">Reddet
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+                <% } else { %>
+                    <div class="bos-durum-kutusu">
+                        <p>Şu an onay bekleyen hiçbir ilan yok.</p>
+                    </div>
+                    <% } %>
+        </main>
+
+        <%- include("../partials/footer") %>
+</body>
+
+</html>

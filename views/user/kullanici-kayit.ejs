@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+</head>
+<%- include("../partials/navbar") %>
+
+    <body>
+
+        <main class="auth-konteyner">
+            <div class="auth-kart">
+                <div class="auth-baslik">
+                    <h1>Hesap Oluştur</h1>
+                    <p>Aramıza katılmak için bilgilerini doldur.</p>
+                </div>
+
+                <% if (typeof hata !=='undefined' && hata) { %>
+                    <div class="hata-mesaji">
+                        <%= hata %>
+                    </div>
+                    <% } %>
+
+                        <form action="/kayit" method="POST" class="auth-form">
+                            <div class="form-row">
+                                <div class="form-grup">
+                                    <label for="ad">Ad</label>
+                                    <input type="text" id="ad" name="ad" placeholder="Adınız" required>
+                                </div>
+
+                                <div class="form-grup">
+                                    <label for="soyad">Soyad</label>
+                                    <input type="text" id="soyad" name="soyad" placeholder="Soyadınız" required>
+                                </div>
+                            </div>
+
+                            <div class="form-grup">
+                                <label for="email">E-posta Adresi</label>
+                                <input type="email" id="email" name="email" placeholder="Email" required>
+                            </div>
+
+                            <div class="form-grup">
+                                <label for="sifre">Şifre</label>
+                                <input type="password" id="sifre" name="sifre" placeholder="******" required>
+                            </div>
+
+
+                            <button type="submit" class="incele-buton tam-genislik">Kayıt Ol</button>
+                        </form>
+
+                        <div class="auth-alt-bilgi">
+                            <p>Zaten bir hesabın var mı? <a href="/giris">Giriş Yap</a></p>
+                        </div>
+            </div>
+        </main>
+
+        <%- include("../partials/footer") %>
+    </body>
+
+</html>

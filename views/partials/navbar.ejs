@@ -1,0 +1,39 @@
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <div class="nav-left">
+      <a href="/" style="text-decoration: none;">İŞBUL</a>
+    </div>
+
+    <div class="nav-center">
+      <ul>
+        <li><a href="/">Anasayfa</a></li>
+        <li><a href="/ilanlar">İş İlanları</a></li>
+        <% if (locals.user) { %>
+          <li><a href="/ilan-ekle">İlan Ver</a></li>
+          <% } %>
+            <% if (locals.user && locals.user.rol==="admin" ) { %>
+              <li><a href="/admin/ilan-onay">İlan Onay</a></li>
+              <li><a href="/admin/kategori-ekle">Kategori Ekle</a></li>
+              <% } %>
+        <% if (locals.user) { %>
+         <li><a href="/ilanlarim">İlanlarım</a></li>
+        <% } %>
+      </ul>
+    </div>
+
+    <div class="nav-right">
+      <ul>
+        <% if (locals.user) { %>
+          <li><a href="/profil">
+              <%= user.ad %>
+                <%= user.soyad %>
+            </a></li>
+          <li><a href="/cikis">Çıkış Yap</a></li>
+          <% } else { %>
+            <li><a href="/giris">Giriş Yap</a></li>
+            <li><a href="/kayit">Kayıt Ol</a></li>
+            <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>

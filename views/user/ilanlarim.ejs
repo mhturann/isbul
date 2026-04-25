@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+</head>
+<%- include("../partials/navbar") %>
+
+    <body>
+
+        <main class="ilanlarim-konteyner">
+
+            <div class="sayfa-ust-kisim">
+                <div>
+                    <h1 style="margin: 0; color: #1f2937;">İlanlarım</h1>
+                </div>
+                <a href="/ilan-ekle" class="yeni-ilan-btn">
+                   Yeni İlan Ver
+                </a>
+            </div>
+
+            <% if (ilanlarim && ilanlarim.length> 0) { %>
+                <div class="ilanlar-grid">
+                    <% ilanlarim.forEach(ilan=> { %>
+                        <div class="ilan-kart">
+                            <div class="ilan-kart-ust">
+                                <h2 class="ilan-baslik">
+                                    <%= ilan.baslik %>
+                                </h2>
+
+                                <% if (ilan.durum==0) { %>
+                                    <span class="durum-etiket durum-onay">Onay Bekliyor</span>
+                                    <% } else if (ilan.durum==1) { %>
+                                        <span class="durum-etiket durum-aktif">Yayında</span>
+                                        <% } else if (ilan.durum==2) { %>
+                                            <span class="durum-etiket durum-islemde">İşlemde</span>
+                                            <% } %>
+                            </div>
+
+                            <div class="ilan-kart-alt">
+                                <p style="color: #64748b; font-size: 0.9rem; margin: 0;">
+                                    İlan No: <strong>#<%= ilan.id %></strong>
+                                </p>
+
+                                <a href="/ilan/<%= ilan.id %>" class="detay-btn">
+                                    İlanı Görüntüle
+                                </a>
+                            </div>
+
+                        </div>
+                        <% }) %>
+                </div>
+                <% } else { %>
+
+                    <div class="bos-durum-kutusu">
+                        <h2 style="color: #475569; margin: 0 0 10px 0;">İlanınız Bulunmuyor</h2>
+                        <p style="color: #94a3b8; margin: 0 0 20px 0; max-width: 400px; line-height: 1.5;">
+                            İlan eklemek için butona tıklayınız.
+                        </p>
+                        <a href="/ilan-ekle" class="yeni-ilan-btn" style="display: inline-block;">
+                            İlan Ekle
+                        </a>
+                    </div>
+
+                    <% } %>
+
+        </main>
+
+        <%- include('../partials/footer') %>
+    </body>
+
+</html>

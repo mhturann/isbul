@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+</head>
+<%- include("../partials/navbar") %>
+
+    <body>
+
+        <main class="auth-konteyner">
+            <div class="auth-kart" style="max-width: 600px;">
+                <div class="auth-baslik">
+                    <h1>Yeni İş İlanı Ver</h1>
+                    <p>İhtiyacın olan hizmet için detayları aşağıya gir.</p>
+                </div>
+
+                <% if (typeof hata !=='undefined' && hata) { %>
+                    <div class="hata-mesaji">
+                        <%= hata %>
+                    </div>
+                    <% } %>
+
+                        <form action="/ilan-ekle" method="POST" class="auth-form">
+                            <div class="form-grup">
+                                <label for="baslik">İlan Başlığı</label>
+                                <input type="text" id="baslik" name="baslik"
+                                    placeholder="Örn: Evin elektrik tesisatı yenilenecek" required>
+                            </div>
+                            <div class="form-grup">
+                                <label for="kategori_id">Kategori</label>
+                                <select id="kategori_id" name="kategori_id" required>
+                                    <option value="" disabled selected>Kategori Seçin</option>
+
+                                    <% kategoriler.forEach(kategori=> { %>
+                                        <option value="<%= kategori.id %>">
+                                            <%= kategori.kategori_adi %>
+                                        </option>
+                                        <% }) %>
+
+                                </select>
+                            </div>
+
+                            <div class="form-grup">
+                                <label for="aciklama">İşin Detaylı Açıklaması</label>
+                                <textarea id="aciklama" name="aciklama" rows="5"
+                                    placeholder="Yapılacak işi detaylıca anlatın..."
+                                    style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; resize: vertical;"
+                                    required></textarea>
+                            </div>
+
+                            <button type="submit" class="incele-buton tam-genislik">İlanı Yayınla</button>
+                        </form>
+            </div>
+        </main>
+        </main>
+
+        <%- include("../partials/footer") %>
+    </body>
+
+</html>
