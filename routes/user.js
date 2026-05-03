@@ -71,7 +71,7 @@ router.post('/sifremi-unuttum', async (req, res) => {
         const user = await User.findOne({ where: { email: email } });
 
         if (!user) {
-            return res.render('sifremi-unuttum', { hata: "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.", basari: null });
+            return res.render('user/sifremi-unuttum', { hata: "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.", basari: null });
         }
 
         const altiHaneliKod = Math.floor(100000 + Math.random() * 900000).toString();
