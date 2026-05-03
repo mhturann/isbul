@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <%- include("../partials/navbar") %>
+
+    <main class="auth-konteyner">
+        <div class="auth-kart">
+            <div class="auth-baslik">
+                <h1>Kodu Onayla</h1>
+                <p><strong><%= email %></strong> adresine gönderilen 6 haneli kodu girin.</p>
+            </div>
+
+            <% if (typeof hata !== 'undefined' && hata) { %>
+                <div class="hata-mesaji" style="background: #fef2f2; color: #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fecaca; text-align: center; font-size: 0.9rem; font-weight: 600;">
+                    <%= hata %>
+                </div>
+            <% } %>
+
+            <form action="/sifre-kodu-onayla" method="POST" class="auth-form">
+                <input type="hidden" name="email" value="<%= email %>">
+                <div class="form-grup">
+                    <input type="text" name="kod" placeholder="000000" maxlength="6" required
+                        style="text-align: center; font-size: 2rem; letter-spacing: 10px; font-weight: bold; border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px; outline: none; transition: border-color 0.2s;">
+                </div>
+                <button type="submit" class="incele-buton tam-genislik" style="margin-top: 15px;">Kodu Doğrula</button>
+            </form>
+            
+            <div class="auth-alt-bilgi" style="margin-top: 20px; text-align: center;">
+                <p>Kod gelmedi mi? <a href="/sifremi-unuttum" style="color: #171717; text-decoration: none; font-weight: 600;">Tekrar Gönder</a></p>
+            </div>
+        </div>
+    </main>
+
+    <%- include("../partials/footer") %>
+</body>
+
+</html>

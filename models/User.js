@@ -11,7 +11,7 @@ const User = sequelize.define('user', {
     rol:{ type: DataTypes.STRING, allowNull: false, defaultValue: 'musteri' },
     kayitTarihi:{ type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     onay_kodu:{ type: DataTypes.STRING, allowNull: true },
-    onaylandimi:{ type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false }
+    onaylandimi:{ type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 },{freezeTableName: true, timestamps: false});
 
 

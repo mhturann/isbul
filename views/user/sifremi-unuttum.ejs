@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <%- include("../partials/navbar") %>
+
+    <main class="auth-konteyner">
+        <div class="auth-kart">
+            <div class="auth-baslik">
+                <h1>Şifre Sıfırlama</h1>
+                <p>Kayıtlı e-posta adresinizi girin, şifrenizi sıfırlamanız için size bir kod gönderelim.</p>
+            </div>
+
+            <% if (typeof hata !== 'undefined' && hata) { %>
+                <div class="hata-mesaji" style="background: #fef2f2; color: #ef4444; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #fecaca;">
+                    <%= hata %>
+                </div>
+            <% } %>
+            
+            <% if (typeof basari !== 'undefined' && basari) { %>
+                <div class="basari-mesaji" style="background: #ecfdf5; color: #10b981; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #a7f3d0;">
+                    <%= basari %>
+                </div>
+            <% } %>
+
+            <form action="/sifremi-unuttum" method="POST" class="auth-form">
+                <div class="form-grup">
+                    <label for="email">E-posta Adresi</label>
+                    <input type="email" id="email" name="email" placeholder="ornek@email.com" required>
+                </div>
+                
+                <br>
+
+                <button type="submit" class="incele-buton tam-genislik">Gönder</button>
+            </form>
+
+            <div class="auth-alt-bilgi" style="margin-top: 20px; text-align: center;">
+                <p>Şifrenizi hatırladınız mı? <a href="/giris" style="color: #171717; font-weight: 600; text-decoration: none;">Giriş Yap</a></p>
+            </div>
+        </div>
+    </main>
+
+    <%- include("../partials/footer") %>
+</body>
+
+</html>

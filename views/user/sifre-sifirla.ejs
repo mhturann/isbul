@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <%- include("../partials/navbar") %>
+
+        <main class="auth-konteyner">
+    <div class="auth-kart">
+        <div class="auth-baslik">
+            <h1>Yeni Şifre</h1>
+            <p>Lütfen yeni şifrenizi belirleyin.</p>
+        </div>
+
+        <form action="/sifre-sifirla-final" method="POST" class="auth-form">
+            <input type="hidden" name="email" value="<%= email %>">
+            <input type="hidden" name="kod" value="<%= kod %>">
+
+            <div class="form-grup">
+                <label>Yeni Şifre</label>
+                <input type="password" name="yeniSifre" placeholder="••••••••" required minlength="6">
+            </div>
+
+            <br>
+            <button type="submit" class="incele-buton tam-genislik">Şifreyi Güncelle</button>
+        </form>
+    </div>
+</main>
+
+        <%- include("../partials/footer") %>
+</body>
+
+</html>

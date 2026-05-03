@@ -7,47 +7,51 @@
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/main.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-
 </head>
-<%- include("../partials/navbar") %>
 
-    <body>
+<body>
+    <%- include("../partials/navbar") %>
 
-        <main class="auth-konteyner">
-            <div class="auth-kart">
-                <div class="auth-baslik">
-                    <h1>Hoş Geldin</h1>
-                    <p>Devam etmek için hesabına giriş yap.</p>
+    <main class="auth-konteyner">
+        <div class="auth-kart">
+            <div class="auth-baslik">
+                <h1>Hoş Geldin</h1>
+                <p>Devam etmek için hesabına giriş yap.</p>
+            </div>
+
+            <% if (typeof hata !=='undefined' && hata) { %>
+                <div class="hata-mesaji">
+                    <%= hata %>
+                </div>
+            <% } %>
+
+            <form action="/giris" method="POST" class="auth-form">
+                <div class="form-grup">
+                    <label for="email">E-posta Adresi</label>
+                    <input type="email" id="email" name="email" placeholder="Email" required>
                 </div>
 
-                <% if (typeof hata !=='undefined' && hata) { %>
-                    <div class="hata-mesaji">
-                        <%= hata %>
+                <div class="form-grup">
+                    <label for="sifre">Şifre</label>
+                    <input type="password" id="sifre" name="sifre" placeholder="••••••••" required>
+                    
+                    <div style="text-align: right; margin-top: 8px;">
+                        <a href="/sifremi-unuttum" style="font-size: 0.85rem; color: #171717; text-decoration: none; font-weight: 600; transition: color 0.2s;">Şifremi Unuttum?</a>
                     </div>
-                    <% } %>
+                </div>
+                
+                <br>
 
-                        <form action="/giris" method="POST" class="auth-form">
-                            <div class="form-grup">
-                                <label for="email">E-posta Adresi</label>
-                                <input type="email" id="email" name="email" placeholder="Email" required>
-                            </div>
+                <button type="submit" class="incele-buton tam-genislik">Giriş Yap</button>
+            </form>
 
-                            <div class="form-grup">
-                                <label for="sifre">Şifre</label>
-                                <input type="password" id="sifre" name="sifre" placeholder="••••••••" required>
-                            </div>
-                            <br>
-
-                            <button type="submit" class="incele-buton tam-genislik">Giriş Yap</button>
-                        </form>
-
-                        <div class="auth-alt-bilgi">
-                            <p>Henüz hesabın yok mu? <a href="/kayit">Hemen Kayıt Ol</a></p>
-                        </div>
+            <div class="auth-alt-bilgi">
+                <p>Henüz hesabın yok mu? <a href="/kayit">Hemen Kayıt Ol</a></p>
             </div>
-        </main>
+        </div>
+    </main>
 
-        <%- include("../partials/footer") %>
-    </body>
+    <%- include("../partials/footer") %>
+</body>
 
 </html>

@@ -21,6 +21,96 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+router.post('/sifre-sifirla-final', async (req, res) => {
+   try {
+        const { email, kod, yeniSifre } = req.body;
+
+        const user = await User.findOne({ where: { email: email, onay_kodu: kod } });
+
+        if (user) {
+            const hashedPassword = await bcrypt.hash(yeniSifre, 10);
+
+            await User.update(
+                { 
+                    sifre: hashedPassword
+                },
+                { where: { id: user.id } }
+            );
+
+            res.redirect('/giris');
+        } else {
+            res.send("Geçersiz işlem denemesi.");
+        }
+    } catch (error) {
+        console.error("Şifre sıfırlama final hatası:", error);
+        res.redirect('/');
+    }
+});
+
+router.post('/sifre-kodu-onayla', async (req, res) => {
+    try {
+        const { email, kod } = req.body;
+        
+        const user = await User.findOne({ where: { email: email, onay_kodu: kod } });
+
+        if (!user) {
+            return res.render('user/sifre-onay-ekrani', { email, hata: "Girdiğiniz kod hatalı!" });
+        }
+
+        res.render('user/sifre-sifirla', { email: email, kod: kod, hata: null });
+
+    } catch (error) {
+        console.error(error);
+        res.redirect('/');
+    }
+});
+
+router.post('/sifremi-unuttum', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ where: { email: email } });
+
+        if (!user) {
+            return res.render('sifremi-unuttum', { hata: "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.", basari: null });
+        }
+
+        const altiHaneliKod = Math.floor(100000 + Math.random() * 900000).toString();
+        await User.update(
+            { 
+                onay_kodu: altiHaneliKod
+            },
+            { where: { id: user.id } }
+        );
+
+        const mailOptions = {
+            from: '<process.env.EMAIL_USER>',
+            to: user.email,
+            subject: 'Şifre Sıfırlama Kodu',
+            html: `
+                <div style="font-family: Arial; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; text-align: center;">
+                    <h2 style="color: #1f2937;">Şifre Sıfırlama</h2>
+                    <p>Şifrenizi sıfırlamak için kullanacağınız 6 haneli onay kodunuz:</p>
+                    <h1 style="letter-spacing: 10px; color: #3b82f6; background: #f3f4f6; padding: 10px; display: inline-block;">${altiHaneliKod}</h1>
+                </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.render('user/sifre-onay-ekrani', { email: user.email, hata: null });
+
+    } catch (error) {
+        console.error("Hata:", error);
+        res.render('user/sifremi-unuttum', { hata: "Bir hata oluştu.", basari: null });
+    }
+});
+
+router.get('/sifremi-unuttum', (req, res) => {
+    if (req.session.user) return res.redirect('/profil');
+    
+    res.render('user/sifremi-unuttum', { hata: null, basari: null });
+});
+
 router.post('/profil-fotograf-guncelle', multer.single('avatar'), async (req, res) => {
     try {
         if (!req.session.user) return res.redirect('/giris');
