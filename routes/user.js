@@ -21,6 +21,34 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+router.post('/yorum-sil/:id', async (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.redirect('/giris');
+        }
+
+        const yorumId = req.params.id;
+        const ilanId = req.body.ilan_id;
+        const aktifKullaniciId = req.session.user.id;
+        const aktifKullaniciRolu = req.session.user.rol;
+
+        const yorum = await IlanYorum.findByPk(yorumId);
+        if (!yorum) {
+            return res.redirect(`/ilan/${ilanId}`);
+        }
+
+        if (yorum.user_id === aktifKullaniciId || aktifKullaniciRolu === 'admin') {
+            await yorum.destroy();
+        }
+
+        res.redirect(`/ilan/${ilanId}`);
+
+    } catch (error) {
+        console.error("Yorum silme işlemi sırasında hata oluştu:", error);
+        res.redirect('/');
+    }
+});
+
 router.post('/sifre-sifirla-final', async (req, res) => {
    try {
         const { email, kod, yeniSifre } = req.body;
