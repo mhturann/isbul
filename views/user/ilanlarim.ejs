@@ -46,10 +46,16 @@
                                 <p style="color: #64748b; font-size: 0.9rem; margin: 0;">
                                     İlan No: <strong>#<%= ilan.id %></strong>
                                 </p>
-
-                                <a href="/ilan/<%= ilan.id %>" class="detay-btn">
+                                <% if (ilan.durum===2 || ilan.durum===0) { %>
+                                 <a class="detay-btn" style="pointer-events: none; cursor: default; background-color: #cbd5e1; color: #475569;">
                                     İlanı Görüntüle
                                 </a>
+                                <% } %>
+                                <% if (ilan.durum===1) { %>
+                                 <a href="/ilan/<%= ilan.id %>" class="detay-btn">
+                                    İlanı Görüntüle
+                                 </a>
+                                <% } %>
                             </div>
 
                         </div>

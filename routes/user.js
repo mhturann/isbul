@@ -52,19 +52,15 @@ router.post('/yorum-sil/:id', async (req, res) => {
 router.post('/sifre-sifirla-final', async (req, res) => {
    try {
         const { email, kod, yeniSifre } = req.body;
-
         const user = await User.findOne({ where: { email: email, onay_kodu: kod } });
-
         if (user) {
             const hashedPassword = await bcrypt.hash(yeniSifre, 10);
-
             await User.update(
                 { 
                     sifre: hashedPassword
                 },
                 { where: { id: user.id } }
             );
-
             res.redirect('/giris');
         } else {
             res.send("Geçersiz işlem denemesi.");
@@ -97,11 +93,10 @@ router.post('/sifremi-unuttum', async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ where: { email: email } });
-
         if (!user) {
-            return res.render('user/sifremi-unuttum', { hata: "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.", basari: null });
+            return res.render('user/sifremi-unuttum', 
+                { hata: "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.", basari: null });
         }
-
         const altiHaneliKod = Math.floor(100000 + Math.random() * 900000).toString();
         await User.update(
             { 
@@ -109,22 +104,21 @@ router.post('/sifremi-unuttum', async (req, res) => {
             },
             { where: { id: user.id } }
         );
-
         const mailOptions = {
             from: '<process.env.EMAIL_USER>',
             to: user.email,
             subject: 'Şifre Sıfırlama Kodu',
             html: `
-                <div style="font-family: Arial; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; text-align: center;">
+                <div style="font-family: Arial; max-width: 500px; margin: auto; padding: 20px; 
+                border: 1px solid #eee; border-radius: 10px; text-align: center;">
                     <h2 style="color: #1f2937;">Şifre Sıfırlama</h2>
                     <p>Şifrenizi sıfırlamak için kullanacağınız 6 haneli onay kodunuz:</p>
-                    <h1 style="letter-spacing: 10px; color: #3b82f6; background: #f3f4f6; padding: 10px; display: inline-block;">${altiHaneliKod}</h1>
+                    <h1 style="letter-spacing: 10px; color: #3b82f6; 
+                    background: #f3f4f6; padding: 10px; display: inline-block;">${altiHaneliKod}</h1>
                 </div>
             `
         };
-
         await transporter.sendMail(mailOptions);
-
         res.render('user/sifre-onay-ekrani', { email: user.email, hata: null });
 
     } catch (error) {
@@ -254,20 +248,16 @@ router.post("/ilan/:id/yorum-yap", async function (req, res) {
 router.post('/degerlendir/:ilanId', async (req, res) => {
     try {
         if (!req.session.user) return res.redirect('/giris');
-
         const ilanId = req.params.ilanId;
         const musteriId = req.session.user.id;
         const { puan, yorum } = req.body;
-
         const anlasilanTeklif = await teklifler.findOne({
             where: { ilan_id: ilanId, durum: 'Kabul Edildi' }
         });
-
         if (!anlasilanTeklif) {
             console.log("Hata: Bu ilan için kabul edilmiş bir teklif bulunamadı.");
             return res.redirect('/profil');
         }
-
         await Degerlendirmeler.create({
             puan: parseInt(puan),
             yorum: yorum,
@@ -275,19 +265,15 @@ router.post('/degerlendir/:ilanId', async (req, res) => {
             ilan_id: ilanId,
             hizmetveren_id: anlasilanTeklif.hizmetveren_id
         });
-
         await ilanlar.update(
             { durum: 4 },
             { where: { id: ilanId } }
         );
-
         await teklifler.update(
             { durum: 'Tamamlandı' },
             { where: { id: anlasilanTeklif.id } }
         );
-
         res.redirect('/profil');
-
     } catch (error) {
         console.log("Değerlendirme Kayıt Hatası:", error);
         res.redirect('/profil');
@@ -297,10 +283,8 @@ router.post('/degerlendir/:ilanId', async (req, res) => {
 router.get('/mesajlar/:ilanId', async (req, res) => {
     try {
         if (!req.session.user) return res.redirect('/giris');
-
         const ilanId = req.params.ilanId;
         const userId = req.session.user.id;
-
         const ilan = await ilanlar.findByPk(ilanId, {
             include: [{
                 model: teklifler,
@@ -308,15 +292,12 @@ router.get('/mesajlar/:ilanId', async (req, res) => {
                 required: true
             }]
         });
-
         if (!ilan) {
             req.session.toastMesaj = 'Sohbet bulunamadı veya iş henüz onaylanmamış.';
             return res.redirect('/profil');
         }
-
         const ustaId = ilan.tekliflers[0].hizmetveren_id;
         const musteriId = ilan.musteri_id;
-
         if (userId !== ustaId && userId !== musteriId) {
             req.session.toastMesaj = 'Bu sohbete erişim yetkiniz yok!';
             return res.redirect('/profil');
@@ -331,18 +312,14 @@ router.get('/mesajlar/:ilanId', async (req, res) => {
                 }
             }
         );
-
         const sohbet = await Mesajlar.findAll({
             where: { ilan_id: ilanId },
             include: [{ model: User, as: 'gonderen', attributes: ['ad', 'soyad'] }],
             order: [['mesaj_tarihi', 'ASC']]
         });
-
         let karsiTarafId = (userId === musteriId) ? ustaId : musteriId;
         const karsiTaraf = await User.findByPk(karsiTarafId, { attributes: ['ad', 'soyad',"id"] });
-
         res.render('user/mesajlar', { sohbet, ilan, karsiTaraf, userId });
-
     } catch (error) {
         console.log("Mesajlar yüklenirken hata:", error);
         res.redirect('/profil');
@@ -352,31 +329,23 @@ router.get('/mesajlar/:ilanId', async (req, res) => {
 router.post('/mesaj-gonder/:ilanId', async (req, res) => {
     try {
         if (!req.session.user) return res.redirect('/giris');
-
         const ilanId = req.params.ilanId;
         const userId = req.session.user.id;
         const { mesaj_icerik } = req.body;
-
         const ilan = await ilanlar.findByPk(ilanId, {
             include: [{ model: teklifler, where: { durum: 'Kabul Edildi' } }]
         });
-
         if (!ilan) return res.redirect('/profil');
-
         const ustaId = ilan.tekliflers[0].hizmetveren_id;
         const musteriId = ilan.musteri_id;
-
         let aliciId = (userId === musteriId) ? ustaId : musteriId;
-
         await Mesajlar.create({
             gonderen_id: userId,
             alici_id: aliciId,
             ilan_id: ilanId,
             mesaj: mesaj_icerik
         });
-
         res.redirect(`/mesajlar/${ilanId}`);
-
     } catch (error) {
         console.log("Mesaj gönderme hatası:", error);
         res.redirect(`/mesajlar/${req.params.ilanId}`);
@@ -386,24 +355,18 @@ router.post('/mesaj-gonder/:ilanId', async (req, res) => {
 router.post('/teklif-reddet/:id', async (req, res) => {
     try {
         if (!req.session.user) return res.redirect('/giris');
-
         const teklifId = req.params.id;
-
         const teklif = await teklifler.findByPk(teklifId, {
             include: [{ model: ilanlar }]
         });
-
         if (!teklif || teklif.ilanlar.musteri_id !== req.session.user.id) {
             req.session.toastMesaj = 'Yetkisiz işlem veya teklif bulunamadı.';
             return res.redirect('/profil');
         }
-
         teklif.durum = 'Reddedildi';
         await teklif.save();
-
         req.session.toastMesaj = 'Teklif reddedildi.';
         res.redirect('/profil');
-
     } catch (error) {
         console.log("Teklif reddetme hatası:", error);
         res.redirect('/profil');
@@ -413,35 +376,26 @@ router.post('/teklif-reddet/:id', async (req, res) => {
 router.post('/teklif-kabul/:id', async (req, res) => {
     try {
         if (!req.session.user) return res.redirect('/giris');
-
         const teklifId = req.params.id;
-
         const kazananTeklif = await teklifler.findByPk(teklifId, {
             include: [{ model: ilanlar }]
         });
-
         if (!kazananTeklif || kazananTeklif.ilanlar.musteri_id !== req.session.user.id) {
             req.session.toastMesaj = 'Yetkisiz işlem!';
             return res.redirect('/profil');
         }
-
         const ilanId = kazananTeklif.ilan_id;
-
         await teklifler.update(
             { durum: 'Reddedildi' },
             { where: { ilan_id: ilanId } }
         );
-
         kazananTeklif.durum = 'Kabul Edildi';
         await kazananTeklif.save();
-
         const guncellenecekIlan = kazananTeklif.ilanlar;
         guncellenecekIlan.durum = 2;
         await guncellenecekIlan.save();
-
         req.session.toastMesaj = 'Teklif başarıyla kabul edildi! İlanınız yayından kaldırıldı.';
         res.redirect('/profil');
-
     } catch (error) {
         console.log("Teklif kabul etme hatası:", error);
         res.redirect('/profil');
@@ -511,23 +465,18 @@ router.post('/teklif-ver/:id', async (req, res) => {
         if (!req.session.user) {
             return res.redirect('/giris');
         }
-
         const ilanId = req.params.id;
         const { teklif_fiyati, mesaj } = req.body;
         const hizmetverenId = req.session.user.id;
-
         const ilan = await ilanlar.findByPk(ilanId);
-
         if (!ilan) {
             req.session.toastMesaj = 'Böyle bir ilan bulunamadı veya silinmiş.';
             return res.redirect('/');
         }
-
         if (ilan.musteri_id === hizmetverenId) {
             req.session.toastMesaj = 'Kendi ilanınıza teklif veremezsiniz!';
             return res.redirect(`/ilan/${ilanId}`);
         }
-
         await teklifler.create({
             ilan_id: ilanId,
             hizmetveren_id: hizmetverenId,
@@ -535,7 +484,6 @@ router.post('/teklif-ver/:id', async (req, res) => {
             mesaj: mesaj,
             durum: "Bekliyor"
         });
-
         req.session.toastMesaj = 'Teklifiniz başarıyla gönderildi!';
         res.redirect(`/ilan/${ilanId}`);
 
@@ -591,7 +539,6 @@ router.post('/ilan-ekle', async (req, res) => {
         if (!req.session.user) {
             return res.redirect('/giris');
         }
-
         const { baslik, aciklama, kategori_id } = req.body;
 
         await ilanlar.create({
@@ -601,9 +548,8 @@ router.post('/ilan-ekle', async (req, res) => {
             musteri_id: req.session.user.id,
             durum: req.session.user.rol === 'admin' ? 1 : 0
         });
-
         req.session.toastMesaj = req.session.user.rol === 'admin' ? 'İlanınız başarıyla eklendi.' : 'İlanınız onaylandıktan sonra yayınlanacaktır.';
-
+        
         res.redirect('/');
 
     } catch (error) {
@@ -653,13 +599,11 @@ router.get('/dogrulama', (req, res) => {
 router.post('/dogrulama', async (req, res) => {
     try {
         const { email, kod } = req.body;
-
         const kullanici = await User.findOne({ where: { email: email } });
 
         if (!kullanici) {
             return res.render('user/dogrulama', { email: email, hata: 'Kullanıcı bulunamadı.' });
         }
-
         if (kullanici.onay_kodu === kod) {
             kullanici.onaylandimi = true;
             await kullanici.save();
@@ -684,23 +628,18 @@ router.post('/giris', async (req, res) => {
     try {
         const { email, sifre } = req.body;
         const kullanici = await User.findOne({ where: { email: email } });
-
         if (!kullanici) {
             return res.render('user/kullanici-giris', { hata: 'E-posta adresiniz veya şifreniz hatalı!' });
         }
-
         const sifreDogruMu = await bcrypt.compare(sifre, kullanici.sifre);
         if (!sifreDogruMu) {
             return res.render('user/kullanici-giris', { hata: 'E-posta adresiniz veya şifreniz hatalı!' });
         }
-
         if (kullanici.onaylandi_mi === false) {
             return res.redirect(`/dogrulama?email=${email}`);
         }
-
         req.session.user = kullanici;
         res.redirect('/');
-
     } catch (error) {
         console.log("Giriş işlemi sırasında hata:", error);
         res.render('user/kullanici-giris', { hata: 'Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.' });
@@ -718,20 +657,15 @@ router.get("/kayit", function (req, res) {
 router.post('/kayit', async (req, res) => {
     try {
         const { ad, soyad, email, sifre } = req.body;
-
         const kullaniciVarMi = await User.findOne({ where: { email: email } });
-
         if (kullaniciVarMi) {
             return res.render('user/kullanici-kayit', { hata: 'Bu e-posta adresi sistemde zaten kayıtlı!' });
         }
         if (sifre.length < 6) {
             return res.render('user/kullanici-kayit', { hata: 'Şifre en az 6 karakter olmalıdır!' });
         }
-
         const hashliSifre = await bcrypt.hash(sifre, 10);
-
         const dogrulamaKodu = Math.floor(100000 + Math.random() * 900000).toString();
-
         await User.create({
             ad,
             soyad,
@@ -740,23 +674,18 @@ router.post('/kayit', async (req, res) => {
             onay_kodu: dogrulamaKodu,
             onaylandi_mi: false
         });
-
         req.session.toastMesaj = 'Doğrulama kodunuz e-posta adresinize gönderildi. Lütfen hesabınızı doğrulayın.';
-
         const mailAyarlari = {
             from: "mehmetturanemin8@gmail.com",
             to: email,
             subject: "İşbul - Kayıt Doğrulama Kodu",
             text: `Sisteme kayıt olmak için doğrulama kodunuz: ${dogrulamaKodu}`
         };
-
         await transporter.sendMail(mailAyarlari);
-
         res.redirect(`/dogrulama?email=${email}`);
-
     } catch (error) {
         console.log(error);
-        res.render('kayit', { hata: 'Beklenmeyen bir hata oluştu, lütfen tekrar deneyin.' });
+        res.render('user/kullanici-kayit', { hata: 'Beklenmeyen bir hata oluştu, lütfen tekrar deneyin.' });
     }
 });
 
@@ -776,18 +705,15 @@ router.get('/ilan/:id', async (req, res) => {
                 [{ model: IlanYorum, as: 'yorumlar' }, 'yorum_tarihi', 'DESC']
             ]
         });
-
         if (!ilanDetay || ilanDetay.durum === 3 || ilanDetay.durum === 4 || ilanDetay.durum === 0 || ilanDetay.durum === 2) {
             req.session.toastMesaj = 'Böyle bir ilan bulunamadı.';
             return res.status(404).redirect("/");
 
         }
-
         if (ilanDetay.durum === 3) {
             req.session.toastMesaj = 'Böyle bir ilan bulunamadı.';
             return res.redirect('/');
         }
-
         res.render('user/ilan-detay', { ilan: ilanDetay });
     } catch (error) {
         console.error("Detay sayfası hatası:", error);
